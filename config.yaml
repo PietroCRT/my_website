@@ -34,16 +34,16 @@ params:
     text: Please visit [this page](/)
   favicon: favicon.ico
   footer:
-    \#copyright: Company Name
+    #copyright: Company Name
     enable: yes
     quicklinks:
       - alt: HTML5 UP
         text: 'Design: '
         url: https://www.html5up.net
     social:
-     \#- icon: fa-twitter
-        label: Twitter
-        url: https://www.twitter.com
+#    - icon: fa-twitter
+#        label: Twitter
+#        url: https://www.twitter.com
       - icon: fa-facebook
         label: Facebook
         url: https://www.facebook.com/pietro.roccoditorrepadula
@@ -115,3 +115,6 @@ params:
       amet pharetra et feugiat tempus."
     title: Massa libero
     url: blogs
+    
+    
+         
