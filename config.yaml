@@ -100,10 +100,10 @@ params:
         subtitle: How have the monthly rentals moved around their long-term monthly mean in the last years?
         title: Fluctuations in Monthly TFL Bike Rentals
         url: blogs/tfl_bike
-      - image: pic06.jpg
-        subtitle: Feugiat Amet Tempus
-        title: Etiam
-        url: blogs/ipsum
+      - image: gdp.jpg
+        subtitle: How the proportional importance of components of GDP evolved over time in different countries
+        title: Evolution of GDP Components Across Countries
+        url: blogs/gdp_components
   two:
     buttonText: Get Started
     enable: yes

@@ -1,0 +1,160 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: An analysis of the evolution in importance of different components of gdp in different countries # the title that will show up once someone gets to this page
+draft: false
+image: gdp_1.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: gdp_components # slug is the shorthand URL address... no spaces plz
+title: Evolution of GDP Components Across Countries
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-libraries, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(GGally)
+library(readxl)
+library(here)
+library(skimr)
+library(janitor)
+library(broom)
+library(tidyquant)
+library(infer)
+library(openintro)
+```
+
+
+
+# Challenge 2: GDP components over time and among countries
+
+At the risk of oversimplifying things, the main components of gross domestic product, GDP are personal consumption (C), business investment (I), government spending (G) and net exports (exports - imports). You can read more about GDP and the different approaches in calculating at the [Wikipedia GDP page](https://en.wikipedia.org/wiki/Gross_domestic_product).
+
+The GDP data we will look at is from the [United Nations' National Accounts Main Aggregates Database](https://unstats.un.org/unsd/snaama/Downloads), which contains estimates of total GDP and its components for all countries from 1970 to today. We will look at how GDP and its components have changed over time, and compare different countries and how much each component contributes to that country's GDP. The file we will work with is [GDP and its breakdown at constant 2010 prices in US Dollars](http://unstats.un.org/unsd/amaapi/api/file/6) and it has already been saved in the Data directory. Have a look at the Excel file to see how it is structured and organised
+
+
+```{r read_GDP_data}
+
+UN_GDP_data  <-  read_excel(here::here("data", "Download-GDPconstant-USD-countries.xls"), # Excel filename
+                sheet="Download-GDPconstant-USD-countr", # Sheet name
+                skip=2) # Number of rows to skip
+
+```
+
+ The first thing you need to do is to tidy the data, as it is in wide format and you must make it into long, tidy format. Please express all figures in billions (divide values by `1e9`, or $10^9$), and you want to rename the indicators into something shorter.
+
+
+```{r reshape_GDP_data}
+library(data.table)
+library(DataCombine)
+tidy_GDP_long  <- UN_GDP_data %>% gather(year,value,-c(CountryID,Country,IndicatorName)) %>% summarise(CountryID,Country,IndicatorName,year,valueBn=value/1e9)
+
+tidy_GDP_long$IndicatorName <- gsub("\\(.*?\\)", "", tidy_GDP_long$IndicatorName)
+
+glimpse(tidy_GDP_long)
+
+tidy_GDP_long$IndicatorName %>% unique()
+toberep <-tidy_GDP_long$IndicatorName %>% unique()
+torep <- c("Final Consumption","Household Consumption","Government Expenditure","Gross Capital Formation","Gross Fixed Capital formation","Exports","Imports","GDP","Agriculture, hunting, forestry, fishing","Mining, Manufacturing, Utilities","Manufacturing","Construction","Trade, hotels, restarants","Transport, Storage, Communication","Other","Total Value Added","Change in Inventories")
+
+
+tidy_GDP_long[tidy_GDP_long=="Final consumption expenditure"]<-"Final Consumption"
+tidy_GDP_long[tidy_GDP_long==toberep[1]]<-torep[1]
+tidy_GDP_long[tidy_GDP_long==toberep[2]]<-torep[2]
+tidy_GDP_long[tidy_GDP_long==toberep[3]]<-torep[3]
+tidy_GDP_long[tidy_GDP_long==toberep[4]]<-torep[4]
+tidy_GDP_long[tidy_GDP_long==toberep[5]]<-torep[5]
+tidy_GDP_long[tidy_GDP_long==toberep[6]]<-torep[6]
+tidy_GDP_long[tidy_GDP_long==toberep[7]]<-torep[7]
+tidy_GDP_long[tidy_GDP_long==toberep[8]]<-torep[8]
+tidy_GDP_long[tidy_GDP_long==toberep[9]]<-torep[9]
+tidy_GDP_long[tidy_GDP_long==toberep[10]]<-torep[10]
+tidy_GDP_long[tidy_GDP_long==toberep[11]]<-torep[11]
+tidy_GDP_long[tidy_GDP_long==toberep[12]]<-torep[12]
+tidy_GDP_long[tidy_GDP_long==toberep[13]]<-torep[13]
+tidy_GDP_long[tidy_GDP_long==toberep[14]]<-torep[14]
+tidy_GDP_long[tidy_GDP_long==toberep[15]]<-torep[15]
+tidy_GDP_long[tidy_GDP_long==toberep[16]]<-torep[16]
+tidy_GDP_long[tidy_GDP_long==toberep[17]]<-torep[17]
+
+
+
+# Let us compare GDP components for these 3 countries
+country_list <- c("United States","India", "Germany")
+indicator_list <- c("Gross Capital Formation","Exports","Government Expenditure", "Household Consumption","Imports")
+
+```
+
+First, can you produce this plot?
+
+
+```{r gdp1, echo=FALSE, out.width="100%"}
+
+
+
+
+tidy_GDP_long %>%
+  filter(IndicatorName %in% indicator_list, Country %in% country_list) %>%
+  group_by(IndicatorName) %>%
+  ggplot(aes(x=year,y=valueBn)) +
+  geom_path(aes(group=IndicatorName,color=IndicatorName)) +
+  facet_wrap(~Country)+
+  theme_bw()+scale_x_discrete(breaks=seq(1970,2010,10))+
+ xlab("")+
+  ylab("Billion US$")+
+  labs(color="Components of GDP",
+       title="GDP components over time",
+       subtitle = "In constant 2010 USD")+
+  theme(plot.title = element_text(face = "bold"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 10))+
+  scale_colour_manual(values = c("Gross Capital Formation" = "red", "Exports" = "darkgoldenrod4",
+                                 "Government Expenditure"="green",
+                                 "Household Consumption"="cyan3",
+                                 "Imports"="darkorchid1"))
+  
+  
+#Reference graph
+knitr::include_graphics(here::here("images", "gdp1.png"), error = FALSE)
+```
+
+
+Secondly, recall that GDP is the sum of Household Expenditure (Consumption *C*), Gross Capital Formation (business investment *I*), Government Expenditure (G) and Net Exports (exports - imports). Even though there is an indicator `Gross Domestic Product (GDP)` in your dataframe, I would like you to calculate it given its components discussed above.
+
+> What is the % difference between what you calculated as GDP and the GDP figure included in the dataframe?
+
+```{r}
+indicator_list_2 <- c("Gross Capital Formation","Exports","Government Expenditure", "Household Consumption")
+
+tidy_GDP_long %>%filter(Country %in% country_list,year==2017) %>% 
+  group_by(Country) %>%
+  summarize(GDP_formula = sum(valueBn[IndicatorName %in% indicator_list_2])-sum(valueBn[IndicatorName=="Imports"]),GDP=sum(valueBn[IndicatorName=="GDP"]),Delta_per=((GDP_formula-GDP)/GDP)*100)
+
+#For the countries considered before the GDP calculated with the formula is very close to the GDP figure provided by the indicator: for Germany and the US the calculated GDP is just 4 basis points below the provided figure, India's one is almost 2% below.
+ 
+```
+
+
+```{r gdp2, echo=FALSE, out.width="100%"}
+knitr::include_graphics(here::here("images", "gdp2.png"), error = FALSE)
+```
+
+
+
+> What is this last chart telling you? Can you explain in a couple of paragraphs the different dynamic among these three countries? 
+
+Germany
+The proportion of the different components of GDP is quite constant in the time-period considered, only changes are a decrease in importance of investments (Gross capital formation) counteracted by a surge in net exports starting in the early 2000s. Possible explanation for this is that German companies were facilitated in their exports by the introduction of the Euro in 2002, hence they started investing less due to decreased competitive pressure.
+
+India
+India follows a typical catch-up path in which at the beginning consumption is substituted with investments, this can be the result of government policies that favored business investments instead of houshehold consumption. In the latter years, both components seem to have reached a rather steady state, signifying that India is becoming a developed country.
+
+United States
+In the US, as foreseeable, we see steadily increasing household consumption proportion, meaning a slow but continous increase in the disposable income of American families. At the same time the proportion of government spending is declining, to signify increasingly conservative economic policies: lower taxes which also explain proportionally increased consumption and tighter government spending. Net exports declines in the period (always in proportion) probably because of the reduced competitiveness of american products vs. South-East Asia.
