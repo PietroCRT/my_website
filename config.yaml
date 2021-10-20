@@ -84,10 +84,10 @@ params:
         subtitle: Ipsum Dolor Sit Amet
         title: Aliquam
         url: blogs/risk_return
-      - image: pic02.jpg
-        subtitle: Feugiat Amet Tempus
-        title: Tempus
-        url: blogs/tempus
+      - image: face2face.jpg
+        subtitle: Analysis of the impact of political preferences on global warming beliefs
+        title: Global Warming and Political View in the U.S
+        url: blogs/global_warming
       - image: pic03.jpg
         subtitle: Lorem Etiam Nullam
         title: Magna

@@ -1,0 +1,205 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: Global Warming and Political View in the U.S. # the title that will show up once someone gets to this page
+draft: false
+image: bidentrump.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: global_warming # slug is the shorthand URL address... no spaces plz
+title: Global Warming and Political View in the U.S
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Global warming and political views (GSS)
+
+[A 2010 Pew Research poll](https://www.pewresearch.org/2010/10/27/wide-partisan-divide-over-global-warming/) asked 1,306 Americans, "From what you've read and heard, is there solid evidence that the average temperature on earth has been getting warmer over the past few decades, or not?"
+
+
+In this exercise we analyze whether there are any differences between the proportion of people who believe the earth is getting warmer and their political ideology. As usual, from the **survey sample data**, we will use the proportions to estimate values of *population parameters*. The file has 2253 observations on the following 2 variables:
+
+- `party_or_ideology`: a factor (categorical) variable with levels Conservative Republican, Liberal Democrat, Mod/Cons Democrat, Mod/Lib Republican
+- `response` : whether the respondent believes the earth is warming or not, or Don't know/ refuse to answer
+
+```{r, read_global_warming_pew_data}
+global_warming_pew <- read_csv("/Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/ca09.mfa2022/data/global_warming_pew.csv")
+```
+
+You will also notice that many responses should not be taken into consideration, like "No Answer", "Don't Know", "Not applicable", "Refused to Answer".
+
+
+```{r}
+global_warming_pew %>% 
+  count(party_or_ideology, response)
+
+unique(global_warming_pew[c("response")])
+```
+
+We will be constructing three 95% confidence intervals to estimate population parameters, for the % who believe that **Earth is warming**, accoridng to their party or ideology. You can create the CIs using the formulas by hand, or use `prop.test()`-- just rememebr to exclude the Dont know / refuse to answer!
+
+Does it appear that whether or not a respondent believes the earth is warming is independent of their party ideology? You may want to 
+
+You may want to read on [The challenging politics of climate change](https://www.brookings.edu/research/the-challenging-politics-of-climate-change/)
+
+```{r}
+
+
+#Conservative Republican
+ci_rep <- global_warming_pew %>% 
+  filter(party_or_ideology=="Conservative Republican",
+    response!="Don't know / refuse to answer")
+ci_rep$response<-ifelse(ci_rep$response=="Earth is warming",1,0)
+
+ci_rep %>% summarise(mean_res=mean(response),
+                     sd_res=sqrt(mean_res*(1-mean_res)),
+                     count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)
+
+#Moderate / Liberal Republican 
+ci_mod_rep<- global_warming_pew %>% 
+  filter(party_or_ideology=="Mod/Lib Republican",
+    response!="Don't know / refuse to answer")
+ci_mod_rep$response<-ifelse(ci_mod_rep$response=="Earth is warming",1,0)
+
+ci_mod_rep %>% summarise(mean_res=mean(response),
+                         sd_res=sqrt(mean_res*(1-mean_res)),
+                         count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)
+
+#Moderate / Conservative Democrat  
+ci_mod_dem<- global_warming_pew %>% 
+  filter(party_or_ideology=="Mod/Cons Democrat",
+    response!="Don't know / refuse to answer")
+ci_mod_dem$response<-ifelse(ci_mod_dem$response=="Earth is warming",1,0)
+
+ci_mod_dem %>% summarise(mean_res=mean(response),
+                         sd_res=sqrt(mean_res*(1-mean_res)),
+                         count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)
+
+#Liberal Democrat  
+ci_dem<- global_warming_pew %>% 
+  filter(party_or_ideology=="Liberal Democrat",
+    response!="Don't know / refuse to answer")
+ci_dem$response<-ifelse(ci_dem$response=="Earth is warming",1,0)
+
+ci_dem %>% summarise(mean_res=mean(response),
+                         sd_res=sqrt(mean_res*(1-mean_res)),
+                         count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)
+
+# The 4 confidence intervals for each ideology do not "step of each other", hence we can say that with level of confidence 95% the belief that Earth is warming is dependent upon political ideology.
+
+```
+
+# Biden's Approval Margins
+
+As we saw in class, fivethirtyeight.com has detailed data on [all polls that track the president's approval ](https://projects.fivethirtyeight.com/biden-approval-ratings)
+
+```{r, cache=TRUE}
+# Import approval polls data directly off fivethirtyeight website
+approval_polllist <- read_csv('https://projects.fivethirtyeight.com/biden-approval-data/approval_polllist.csv') 
+
+approval_polllist$Date <- mdy(approval_polllist$enddate) 
+```
+
+## Create a plot
+
+What I would like you to do is to calculate the average net approval rate (approve- disapprove) for each week since he got into office. I want you plot the net approval, along with its 95% confidence interval. There are various dates given for each poll, please use `enddate`, i.e., the date the poll ended.
+
+Also, please add an orange line at zero. Your plot should look like this:
+
+```{r}
+approval_polllist$week_no <-strftime(approval_polllist$Date-17, format="%V")
+
+approval_polllist2 <- approval_polllist %>% mutate(delta1=(adjusted_approve-adjusted_disapprove)/100)
+
+# We create all the variables that we will need to plot the evolution of the weighted mean approval margin of President Biden with the relative 95% C.I.. Weights are the number of respondents to each survey
+library(Hmisc)
+approval_polllist3<- approval_polllist2 %>% 
+  group_by(week_no) %>%
+  group_by(week_no) %>% 
+ mutate(weekly_mean_w=wtd.mean(delta1, samplesize),
+        weekly_sd_w=sqrt(wtd.var(delta1,samplesize)),
+        count_obs=n(),
+        t_critical3=qt(0.975,count_obs-1),
+        se_delta=weekly_sd_w/sqrt(count_obs),
+        error_margin3=t_critical3*se_delta,
+        delta_low=weekly_mean_w-error_margin3,
+        delta_high=weekly_mean_w+error_margin3) 
+approval_polllist3$week_no <- as.numeric(as.character(approval_polllist3$week_no))
+
+#We create all the variables that we will need to plot the evolution of the simple mean approval margin of President Biden with the relative 95% C.I.
+
+approval_polllist4<- approval_polllist2 %>% group_by(week_no) %>% group_by(week_no) %>% 
+ mutate(weekly_mean=mean(delta1),
+        weekly_sd=sqrt(var(delta1)),
+        count_obs=n(),
+        t_critical3=qt(0.975,count_obs-1),
+        se_delta=weekly_sd/sqrt(count_obs),
+        error_margin3=t_critical3*se_delta,
+        delta_low=weekly_mean-error_margin3,
+        delta_high=weekly_mean+error_margin3) 
+approval_polllist4$week_no <- as.numeric(as.character(approval_polllist4$week_no))
+
+```
+
+```{r}
+#Using weighted average and SD with the weights being the number of respondents to each survey
+approval_polllist3 %>% ggplot(aes(x=week_no,y=weekly_mean_w))+
+  geom_ribbon(aes(ymin=delta_low, ymax=delta_high),fill="grey",alpha=0.4,colour="red",size=0.1)+
+  geom_point(color="orange",size=1)+
+  geom_line(color="orange",size=0.6)+
+  geom_smooth(method="loess",size=1,se=FALSE)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1),breaks=seq(-0.075,0.17,by=0.025))+
+  theme_minimal(base_size = 12)+
+  ggtitle("Estimating Approval Margin (approve-disapprove) for Joe Biden",
+          subtitle = "Weekly Average of All Polls")+
+  xlab("Week of the Year")+
+  ylab("Average Approval Margin (Approve - Disapprove)")+
+  geom_hline(aes(yintercept = 0,color="orange"),size=2,show.legend = FALSE)+
+  scale_x_continuous(breaks=c(13,26,39))
+
+#Using simple average and SD
+approval_polllist4 %>% ggplot(aes(x=week_no,y=weekly_mean))+
+  geom_ribbon(aes(ymin=delta_low, ymax=delta_high),fill="grey",alpha=0.4,colour="red",size=0.1)+
+  geom_point(color="orange",size=1)+
+  geom_line(color="orange",size=0.6)+
+  geom_smooth(method="loess",size=1,se=FALSE)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1),breaks=seq(-0.075,0.17,by=0.025))+
+  theme_minimal(base_size = 12)+
+  ggtitle("Estimating Approval Margin (approve-disapprove) for Joe Biden",
+          subtitle = "Weekly Average of All Polls")+
+  xlab("Week of the Year")+
+  ylab("Average Approval Margin (Approve - Disapprove)")+
+  geom_hline(aes(yintercept = 0,color="orange"),size=2,show.legend = FALSE)+
+  scale_x_continuous(breaks=c(13,26,39))
+  
+```
+
+```{r trump_margins, echo=FALSE, out.width="100%"}
+# Given plot
+knitr::include_graphics(here::here("images", "biden_approval_margin.png"), error = FALSE)
+```
+
+## Compare Confidence Intervals
+
+Compare the confidence intervals for `week 3` and `week 25`. Can you explain what's going on? One paragraph would be enough.
+> The CI shrunk, this means that either the weekly SD decreased or the number of observations increased; both instances result in a lower standard error that in turn gives a tighter CI. In this particular case more suveys could have been conducted in week 25 vs week 3 or opinions were less scattered 
