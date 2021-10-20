@@ -96,10 +96,10 @@ params:
         subtitle: How did CPI and its components change in the last few years?
         title: Change in CPI and Its Components
         url: blogs/cpi_change
-      - image: pic05.jpg
-        subtitle: Ipsum Dolor Sit Amet
-        title: Consequat
-        url: blogs/ipsum
+      - image: boris.jpg
+        subtitle: How have the monthly rentals moved around their long-term monthly mean in the last years?
+        title: Fluctuations in Monthly TFL Bike Rentals
+        url: blogs/tfl_bike
       - image: pic06.jpg
         subtitle: Feugiat Amet Tempus
         title: Etiam

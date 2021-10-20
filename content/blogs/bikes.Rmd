@@ -1,0 +1,129 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: An analysis of how TFL bike rentals have fluctuated around the long term monthly mean over the course of the last years # the title that will show up once someone gets to this page
+draft: false
+image: tflbike.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: tfl_bike # slug is the shorthand URL address... no spaces plz
+title: Fluctuations in Monthly TFL Bike Rentals
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-libraries, include=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(here)
+library(skimr)
+library(janitor)
+library(httr)
+library(readxl)
+library(vroom)
+```
+
+Recall the TfL data on how many bikes were hired every single day. We can get the latest data by running the following
+
+```{r, get_tfl_data, cache=TRUE}
+url <- "https://data.london.gov.uk/download/number-bicycle-hires/ac29363e-e0cb-47cc-a97a-e216d900a6b0/tfl-daily-cycle-hires.xlsx"
+
+# Download TFL data to temporary file
+httr::GET(url, write_disk(bike.temp <- tempfile(fileext = ".xlsx")))
+
+# Use read_excel to read it as dataframe
+bike0 <- read_excel(bike.temp,
+                   sheet = "Data",
+                   range = cell_cols("A:B"))
+
+# change dates to get year, month, and week
+bike <- bike0 %>% 
+  clean_names() %>% 
+  rename (bikes_hired = number_of_bicycle_hires) %>% 
+  mutate (year = year(day),
+          month = lubridate::month(day, label = TRUE),
+          week = isoweek(day))
+```
+
+
+
+We can easily create a facet grid that plots bikes hired by month and year.
+
+```{r tfl_month_year_grid, echo=FALSE, out.width="100%"}
+knitr::include_graphics(here::here("images", "tfl_distributions_monthly.png"), error = FALSE)
+
+bike <- bike %>% filter(year>=2016) %>% group_by(year,month) %>% mutate(mean_hired=mean(bikes_hired))
+bike1 <- bike %>% filter(year>=2016,year<=2019) %>% group_by(month) %>% mutate(mean_hired_ref=mean(bikes_hired)) 
+bike1 <- bike1 %>% summarise(month,mean_hired_ref) %>%  distinct()
+
+bikex <- merge(x = bike, y = bike1, by = "month", all.x = TRUE)
+bikex$month <- match(bikex$month,month.abb) 
+
+
+```
+
+Look at May and Jun and compare 2020 with the previous years. What's happening?
+
+However, the challenge I want you to work on is to reproduce the following two graphs.
+
+```{r tfl_absolute_monthly_change, echo=FALSE, out.width="100%"}
+knitr::include_graphics(here::here("images", "tfl_monthly.png"), error = FALSE)
+
+bikex$abtest <- ifelse(bikex$mean_hired>bikex$mean_hired_ref, "A", "B") 
+
+bike_final <- bikex %>% summarise(week=week,month=month,year=year,mean_hired=mean_hired,mean_hired_ref=mean_hired_ref,abtest=abtest) %>% distinct()
+
+library(scales)
+
+ggplot(data=bike_final, aes(x=month,y=mean_hired_ref))+
+  geom_line(aes(y=mean_hired_ref),color="blue",size=1)+
+  geom_line(aes(y=mean_hired),size=0.2)+
+  facet_wrap(~year)+
+  geom_ribbon(aes(ymin=pmin(mean_hired_ref,mean_hired),ymax=mean_hired),fill="darkseagreen3",alpha=0.5)+
+   geom_ribbon(aes(ymax=pmax(mean_hired_ref,mean_hired),ymin=mean_hired),fill="coral2",alpha=0.5)+
+  theme_minimal(base_size = 8)+ggtitle("Monthly changes in TfL bike rentals",subtitle = "Change from monthly average shown in blue
+and calculated between 2016-2019")+ylab("Bike rentals")+xlab("") +labs(caption = "Source: Tfl, London Data Store")+  scale_x_discrete(limits = month.abb)
+  
+  
+
+```
+
+The second one looks at percentage changes from the expected level of weekly rentals. The two grey shaded rectangles correspond to Q2 (weeks 14-26) and Q4 (weeks 40-52).
+
+```{r tfl_percent_change, echo=FALSE, out.width="100%"}
+knitr::include_graphics(here::here("images", "tfl_weekly.png"), error = FALSE)
+
+bike3 <- bike %>% filter(year>=2016) %>% group_by(year,month,week) %>% mutate(mean_hired=mean(bikes_hired))
+bike4 <- bike3 %>% filter(year>=2016,year<=2019) %>% group_by(week) %>% mutate(mean_hired_ref=mean(bikes_hired)) 
+bike5 <- bike4 %>% summarise(week,mean_hired_ref) %>%  distinct()
+bike5 <- merge(x = bike3, y = bike5, by = "week", all.x = TRUE)
+bike5 <- bike5 %>% filter(week!=53) %>% mutate(per_wk_diff=mean_hired/mean_hired_ref-1)
+
+ggplot(data=bike5, aes(x=week,y=per_wk_diff))+
+  geom_rect(aes(xmin=14,xmax = 26,ymin = -Inf, ymax = Inf), fill = 'grey92', alpha = 0.05)+
+  geom_rect(aes(xmin=40,xmax = 52,ymin = -Inf, ymax = Inf), fill = 'grey92', alpha = 0.05)+
+  geom_line(size=0.1)+
+  facet_wrap(~year)+
+  theme_minimal(base_size = 8)+
+  geom_ribbon(aes(ymin=pmin(per_wk_diff,0),ymax=0),fill="red",alpha=0.5)+
+  geom_ribbon(aes(ymin=0,ymax=pmax(0,per_wk_diff)),fill="green",alpha=0.5)+
+  geom_rug(sides="b",colour=if_else(bike5$per_wk_diff>0,"green","red"))+
+  ggtitle("Weekly changes in TfL bike rentals",subtitle = "% change from weekly averages
+calculated between 2016-2019")+
+  ylab("")+
+  xlab("")+
+  labs(caption = "Source: Tfl, London Data Store")+
+  scale_y_continuous(labels = scales::percent)
+
+
+
+
+
+```
