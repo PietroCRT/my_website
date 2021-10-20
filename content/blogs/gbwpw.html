@@ -1,0 +1,231 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: Global Warming and Political View in the U.S. # the title that will show up once someone gets to this page
+draft: false
+image: bidentrump.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: global_warming # slug is the shorthand URL address... no spaces plz
+title: Global Warming and Political View in the U.S
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="global-warming-and-political-views-gss" class="section level1">
+<h1>Global warming and political views (GSS)</h1>
+<p><a href="https://www.pewresearch.org/2010/10/27/wide-partisan-divide-over-global-warming/">A 2010 Pew Research poll</a> asked 1,306 Americans, “From what you’ve read and heard, is there solid evidence that the average temperature on earth has been getting warmer over the past few decades, or not?”</p>
+<p>In this exercise we analyze whether there are any differences between the proportion of people who believe the earth is getting warmer and their political ideology. As usual, from the <strong>survey sample data</strong>, we will use the proportions to estimate values of <em>population parameters</em>. The file has 2253 observations on the following 2 variables:</p>
+<ul>
+<li><code>party_or_ideology</code>: a factor (categorical) variable with levels Conservative Republican, Liberal Democrat, Mod/Cons Democrat, Mod/Lib Republican</li>
+<li><code>response</code> : whether the respondent believes the earth is warming or not, or Don’t know/ refuse to answer</li>
+</ul>
+<pre class="r"><code>global_warming_pew &lt;- read_csv(&quot;/Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/ca09.mfa2022/data/global_warming_pew.csv&quot;)</code></pre>
+<pre><code>## Rows: 2253 Columns: 2</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (2): party_or_ideology, response</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>You will also notice that many responses should not be taken into consideration, like “No Answer”, “Don’t Know”, “Not applicable”, “Refused to Answer”.</p>
+<pre class="r"><code>global_warming_pew %&gt;% 
+  count(party_or_ideology, response)</code></pre>
+<pre><code>## # A tibble: 12 × 3
+##    party_or_ideology       response                          n
+##    &lt;chr&gt;                   &lt;chr&gt;                         &lt;int&gt;
+##  1 Conservative Republican Don&#39;t know / refuse to answer    45
+##  2 Conservative Republican Earth is warming                248
+##  3 Conservative Republican Not warming                     450
+##  4 Liberal Democrat        Don&#39;t know / refuse to answer    23
+##  5 Liberal Democrat        Earth is warming                405
+##  6 Liberal Democrat        Not warming                      23
+##  7 Mod/Cons Democrat       Don&#39;t know / refuse to answer    45
+##  8 Mod/Cons Democrat       Earth is warming                563
+##  9 Mod/Cons Democrat       Not warming                     158
+## 10 Mod/Lib Republican      Don&#39;t know / refuse to answer    23
+## 11 Mod/Lib Republican      Earth is warming                135
+## 12 Mod/Lib Republican      Not warming                     135</code></pre>
+<pre class="r"><code>unique(global_warming_pew[c(&quot;response&quot;)])</code></pre>
+<pre><code>## # A tibble: 3 × 1
+##   response                     
+##   &lt;chr&gt;                        
+## 1 Earth is warming             
+## 2 Not warming                  
+## 3 Don&#39;t know / refuse to answer</code></pre>
+<p>We will be constructing three 95% confidence intervals to estimate population parameters, for the % who believe that <strong>Earth is warming</strong>, accoridng to their party or ideology. You can create the CIs using the formulas by hand, or use <code>prop.test()</code>– just rememebr to exclude the Dont know / refuse to answer!</p>
+<p>Does it appear that whether or not a respondent believes the earth is warming is independent of their party ideology? You may want to</p>
+<p>You may want to read on <a href="https://www.brookings.edu/research/the-challenging-politics-of-climate-change/">The challenging politics of climate change</a></p>
+<pre class="r"><code>#Conservative Republican
+ci_rep &lt;- global_warming_pew %&gt;% 
+  filter(party_or_ideology==&quot;Conservative Republican&quot;,
+    response!=&quot;Don&#39;t know / refuse to answer&quot;)
+ci_rep$response&lt;-ifelse(ci_rep$response==&quot;Earth is warming&quot;,1,0)
+
+ci_rep %&gt;% summarise(mean_res=mean(response),
+                     sd_res=sqrt(mean_res*(1-mean_res)),
+                     count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)</code></pre>
+<pre><code>## # A tibble: 1 × 8
+##   mean_res sd_res count_res t_critical2 se_res error_margin2 res_low res_high
+##      &lt;dbl&gt;  &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.355  0.479       698        1.96 0.0181        0.0356   0.320    0.391</code></pre>
+<pre class="r"><code>#Moderate / Liberal Republican 
+ci_mod_rep&lt;- global_warming_pew %&gt;% 
+  filter(party_or_ideology==&quot;Mod/Lib Republican&quot;,
+    response!=&quot;Don&#39;t know / refuse to answer&quot;)
+ci_mod_rep$response&lt;-ifelse(ci_mod_rep$response==&quot;Earth is warming&quot;,1,0)
+
+ci_mod_rep %&gt;% summarise(mean_res=mean(response),
+                         sd_res=sqrt(mean_res*(1-mean_res)),
+                         count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)</code></pre>
+<pre><code>## # A tibble: 1 × 8
+##   mean_res sd_res count_res t_critical2 se_res error_margin2 res_low res_high
+##      &lt;dbl&gt;  &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1      0.5    0.5       270        1.97 0.0304        0.0599   0.440    0.560</code></pre>
+<pre class="r"><code>#Moderate / Conservative Democrat  
+ci_mod_dem&lt;- global_warming_pew %&gt;% 
+  filter(party_or_ideology==&quot;Mod/Cons Democrat&quot;,
+    response!=&quot;Don&#39;t know / refuse to answer&quot;)
+ci_mod_dem$response&lt;-ifelse(ci_mod_dem$response==&quot;Earth is warming&quot;,1,0)
+
+ci_mod_dem %&gt;% summarise(mean_res=mean(response),
+                         sd_res=sqrt(mean_res*(1-mean_res)),
+                         count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)</code></pre>
+<pre><code>## # A tibble: 1 × 8
+##   mean_res sd_res count_res t_critical2 se_res error_margin2 res_low res_high
+##      &lt;dbl&gt;  &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.781  0.414       721        1.96 0.0154        0.0302   0.751    0.811</code></pre>
+<pre class="r"><code>#Liberal Democrat  
+ci_dem&lt;- global_warming_pew %&gt;% 
+  filter(party_or_ideology==&quot;Liberal Democrat&quot;,
+    response!=&quot;Don&#39;t know / refuse to answer&quot;)
+ci_dem$response&lt;-ifelse(ci_dem$response==&quot;Earth is warming&quot;,1,0)
+
+ci_dem %&gt;% summarise(mean_res=mean(response),
+                         sd_res=sqrt(mean_res*(1-mean_res)),
+                         count_res=n(),t_critical2=qt(0.975,count_res-1),
+                     se_res=sd_res/sqrt(count_res),
+                     error_margin2=t_critical2*se_res,
+                     res_low=mean_res-error_margin2,
+                     res_high=mean_res+error_margin2)</code></pre>
+<pre><code>## # A tibble: 1 × 8
+##   mean_res sd_res count_res t_critical2 se_res error_margin2 res_low res_high
+##      &lt;dbl&gt;  &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.946  0.226       428        1.97 0.0109        0.0214   0.925    0.968</code></pre>
+<pre class="r"><code># The 4 confidence intervals for each ideology do not &quot;step of each other&quot;, hence we can say that with level of confidence 95% the belief that Earth is warming is dependent upon political ideology.</code></pre>
+</div>
+<div id="bidens-approval-margins" class="section level1">
+<h1>Biden’s Approval Margins</h1>
+<p>As we saw in class, fivethirtyeight.com has detailed data on <a href="https://projects.fivethirtyeight.com/biden-approval-ratings">all polls that track the president’s approval</a></p>
+<pre class="r"><code># Import approval polls data directly off fivethirtyeight website
+approval_polllist &lt;- read_csv(&#39;https://projects.fivethirtyeight.com/biden-approval-data/approval_polllist.csv&#39;) </code></pre>
+<pre><code>## Rows: 1941 Columns: 22</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (12): president, subgroup, modeldate, startdate, enddate, pollster, grad...
+## dbl  (9): samplesize, weight, influence, approve, disapprove, adjusted_appro...
+## lgl  (1): tracking</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>approval_polllist$Date &lt;- mdy(approval_polllist$enddate) </code></pre>
+<div id="create-a-plot" class="section level2">
+<h2>Create a plot</h2>
+<p>What I would like you to do is to calculate the average net approval rate (approve- disapprove) for each week since he got into office. I want you plot the net approval, along with its 95% confidence interval. There are various dates given for each poll, please use <code>enddate</code>, i.e., the date the poll ended.</p>
+<p>Also, please add an orange line at zero. Your plot should look like this:</p>
+<pre class="r"><code>approval_polllist$week_no &lt;-strftime(approval_polllist$Date-17, format=&quot;%V&quot;)
+
+approval_polllist2 &lt;- approval_polllist %&gt;% mutate(delta1=(adjusted_approve-adjusted_disapprove)/100)
+
+# We create all the variables that we will need to plot the evolution of the weighted mean approval margin of President Biden with the relative 95% C.I.. Weights are the number of respondents to each survey
+library(Hmisc)</code></pre>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## Loading required package: Formula</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Hmisc&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     src, summarize</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     format.pval, units</code></pre>
+<pre class="r"><code>approval_polllist3&lt;- approval_polllist2 %&gt;% 
+  group_by(week_no) %&gt;%
+  group_by(week_no) %&gt;% 
+ mutate(weekly_mean_w=wtd.mean(delta1, samplesize),
+        weekly_sd_w=sqrt(wtd.var(delta1,samplesize)),
+        count_obs=n(),
+        t_critical3=qt(0.975,count_obs-1),
+        se_delta=weekly_sd_w/sqrt(count_obs),
+        error_margin3=t_critical3*se_delta,
+        delta_low=weekly_mean_w-error_margin3,
+        delta_high=weekly_mean_w+error_margin3) 
+approval_polllist3$week_no &lt;- as.numeric(as.character(approval_polllist3$week_no))
+
+#We create all the variables that we will need to plot the evolution of the simple mean approval margin of President Biden with the relative 95% C.I.
+
+approval_polllist4&lt;- approval_polllist2 %&gt;% group_by(week_no) %&gt;% group_by(week_no) %&gt;% 
+ mutate(weekly_mean=mean(delta1),
+        weekly_sd=sqrt(var(delta1)),
+        count_obs=n(),
+        t_critical3=qt(0.975,count_obs-1),
+        se_delta=weekly_sd/sqrt(count_obs),
+        error_margin3=t_critical3*se_delta,
+        delta_low=weekly_mean-error_margin3,
+        delta_high=weekly_mean+error_margin3) 
+approval_polllist4$week_no &lt;- as.numeric(as.character(approval_polllist4$week_no))</code></pre>
+<pre class="r"><code>#Using weighted average and SD with the weights being the number of respondents to each survey
+approval_polllist3 %&gt;% ggplot(aes(x=week_no,y=weekly_mean_w))+
+  geom_ribbon(aes(ymin=delta_low, ymax=delta_high),fill=&quot;grey&quot;,alpha=0.4,colour=&quot;red&quot;,size=0.1)+
+  geom_point(color=&quot;orange&quot;,size=1)+
+  geom_line(color=&quot;orange&quot;,size=0.6)+
+  geom_smooth(method=&quot;loess&quot;,size=1,se=FALSE)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1),breaks=seq(-0.075,0.17,by=0.025))+
+  theme_minimal(base_size = 12)+
+  ggtitle(&quot;Estimating Approval Margin (approve-disapprove) for Joe Biden&quot;,
+          subtitle = &quot;Weekly Average of All Polls&quot;)+
+  xlab(&quot;Week of the Year&quot;)+
+  ylab(&quot;Average Approval Margin (Approve - Disapprove)&quot;)+
+  geom_hline(aes(yintercept = 0,color=&quot;orange&quot;),size=2,show.legend = FALSE)+
+  scale_x_continuous(breaks=c(13,26,39))</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/blogs/gbwpw_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>#Using simple average and SD
+approval_polllist4 %&gt;% ggplot(aes(x=week_no,y=weekly_mean))+
+  geom_ribbon(aes(ymin=delta_low, ymax=delta_high),fill=&quot;grey&quot;,alpha=0.4,colour=&quot;red&quot;,size=0.1)+
+  geom_point(color=&quot;orange&quot;,size=1)+
+  geom_line(color=&quot;orange&quot;,size=0.6)+
+  geom_smooth(method=&quot;loess&quot;,size=1,se=FALSE)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1),breaks=seq(-0.075,0.17,by=0.025))+
+  theme_minimal(base_size = 12)+
+  ggtitle(&quot;Estimating Approval Margin (approve-disapprove) for Joe Biden&quot;,
+          subtitle = &quot;Weekly Average of All Polls&quot;)+
+  xlab(&quot;Week of the Year&quot;)+
+  ylab(&quot;Average Approval Margin (Approve - Disapprove)&quot;)+
+  geom_hline(aes(yintercept = 0,color=&quot;orange&quot;),size=2,show.legend = FALSE)+
+  scale_x_continuous(breaks=c(13,26,39))</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/blogs/gbwpw_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="/Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/my_website/images/biden_approval_margin.png" width="100%" /></p>
+</div>
+<div id="compare-confidence-intervals" class="section level2">
+<h2>Compare Confidence Intervals</h2>
+<p>Compare the confidence intervals for <code>week 3</code> and <code>week 25</code>. Can you explain what’s going on? One paragraph would be enough.
+&gt; The CI shrunk, this means that either the weekly SD decreased or the number of observations increased; both instances result in a lower standard error that in turn gives a tighter CI. In this particular case more suveys could have been conducted in week 25 vs week 3 or opinions were less scattered</p>
+</div>
+</div>
