@@ -88,10 +88,10 @@ params:
         subtitle: Analysis of the impact of political preferences on global warming beliefs
         title: Global Warming and Political View in the U.S
         url: blogs/global_warming
-      - image: pic03.jpg
-        subtitle: Lorem Etiam Nullam
-        title: Magna
-        url: blogs/magna
+      - image: chair.jpeg
+        subtitle: Do the ratings for different directos have statistically significant differences in their averages?
+        title: The Effect of Different Directors on Movie Ratings
+        url: blogs/movies_imdb
       - image: pic04.jpg
         subtitle: Nisl Sed Aliquam
         title: Ipsum

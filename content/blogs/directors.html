@@ -1,0 +1,255 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: Do directors have an effect on IMDB ratings? # the title that will show up once someone gets to this page
+draft: false
+image: tarantino.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: movies_imdb # slug is the shorthand URL address... no spaces plz
+title: The Effect of Different Directors on Movie Ratings
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;mosaic&#39;:
+##   method                           from   
+##   fortify.SpatialPolygonsDataFrame ggplot2</code></pre>
+<pre><code>## 
+## The &#39;mosaic&#39; package masks several functions from core packages in order to add 
+## additional features.  The original behavior of these functions should not be affected by this.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;mosaic&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:Matrix&#39;:
+## 
+##     mean</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     count, do, tally</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     cross</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     stat</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     binom.test, cor, cor.test, cov, fivenum, IQR, median, prop.test,
+##     quantile, sd, t.test, var</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     max, mean, min, prod, range, sample, sum</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ggthemes&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:mosaic&#39;:
+## 
+##     theme_map</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
+##   method from   
+##   +.gg   ggplot2</code></pre>
+<pre><code>## here() starts at /Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/my_website</code></pre>
+<pre><code>## 
+## Attaching package: &#39;skimr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:mosaic&#39;:
+## 
+##     n_missing</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre><code>## Loading required package: lubridate</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## 
+## Attaching package: &#39;xts&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     first, last</code></pre>
+<pre><code>## 
+## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     legend</code></pre>
+<pre><code>## Loading required package: quantmod</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## ══ Need to Learn tidyquant? ════════════════════════════════════════════════════
+## Business Science offers a 1-hour course - Learning Lab #9: Performance Analysis &amp; Portfolio Optimization with tidyquant!
+## &lt;/&gt; Learn more at: https://university.business-science.io/p/learning-labs-pro &lt;/&gt;</code></pre>
+<pre><code>## 
+## Attaching package: &#39;infer&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:mosaic&#39;:
+## 
+##     prop_test, t_test</code></pre>
+<pre><code>## Loading required package: airports</code></pre>
+<pre><code>## Loading required package: cherryblossom</code></pre>
+<pre><code>## Loading required package: usdata</code></pre>
+<pre><code>## 
+## Attaching package: &#39;openintro&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:mosaic&#39;:
+## 
+##     dotPlot</code></pre>
+<pre><code>## The following objects are masked from &#39;package:lattice&#39;:
+## 
+##     ethanol, lsegments</code></pre>
+<p>Recall the IMBD ratings data. I would like you to explore whether the mean IMDB rating for Steven Spielberg and Tim Burton are the same or not. I have already calculated the confidence intervals for the mean ratings of these two directors and as you can see they overlap.</p>
+<p><img src="/Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/my_website/images/directors.png" width="100%" /></p>
+<p>First, I would like you to reproduce this graph. You may find <code>geom_errorbar()</code> and <code>geom_rect()</code> useful.</p>
+<p>In addition, you will run a hpothesis test. You should use both the <code>t.test</code> command and the <code>infer</code> package to simulate from a null distribution, where you assume zero difference between the two.</p>
+<blockquote>
+<p>Before anything, write down the null and alternative hypotheses, as well as the resulting test statistic and the associated t-stat or p-value. At the end of the day, what do you conclude?</p>
+</blockquote>
+<p>You can load the data and examine its structure</p>
+<pre class="r"><code>movies &lt;- read_csv(&quot;/Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/ca09.mfa2022/data/movies.csv&quot;)</code></pre>
+<pre><code>## Rows: 2961 Columns: 11</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (3): title, genre, director
+## dbl (8): year, duration, gross, budget, cast_facebook_likes, votes, reviews,...</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>glimpse(movies)</code></pre>
+<pre><code>## Rows: 2,961
+## Columns: 11
+## $ title               &lt;chr&gt; &quot;Avatar&quot;, &quot;Titanic&quot;, &quot;Jurassic World&quot;, &quot;The Avenge…
+## $ genre               &lt;chr&gt; &quot;Action&quot;, &quot;Drama&quot;, &quot;Action&quot;, &quot;Action&quot;, &quot;Action&quot;, &quot;…
+## $ director            &lt;chr&gt; &quot;James Cameron&quot;, &quot;James Cameron&quot;, &quot;Colin Trevorrow…
+## $ year                &lt;dbl&gt; 2009, 1997, 2015, 2012, 2008, 1999, 1977, 2015, 20…
+## $ duration            &lt;dbl&gt; 178, 194, 124, 173, 152, 136, 125, 141, 164, 93, 1…
+## $ gross               &lt;dbl&gt; 760505847, 658672302, 652177271, 623279547, 533316…
+## $ budget              &lt;dbl&gt; 2.37e+08, 2.00e+08, 1.50e+08, 2.20e+08, 1.85e+08, …
+## $ cast_facebook_likes &lt;dbl&gt; 4834, 45223, 8458, 87697, 57802, 37723, 13485, 920…
+## $ votes               &lt;dbl&gt; 886204, 793059, 418214, 995415, 1676169, 534658, 9…
+## $ reviews             &lt;dbl&gt; 3777, 2843, 1934, 2425, 5312, 3917, 1752, 1752, 35…
+## $ rating              &lt;dbl&gt; 7.9, 7.7, 7.0, 8.1, 9.0, 6.5, 8.7, 7.5, 8.5, 7.2, …</code></pre>
+<p>Your R code and analysis should go here. If you want to insert a blank chunk of R code you can just hit <code>Ctrl/Cmd+Alt+I</code></p>
+<p>First, I would like you to reproduce this graph. You may find <code>geom_errorbar()</code> and <code>geom_rect()</code> useful:</p>
+<pre class="r"><code>S_directors &lt;- movies %&gt;%
+  select(director, rating) %&gt;%
+  filter(director == &quot;Steven Spielberg&quot; | director == &quot;Tim Burton&quot;) %&gt;%
+  group_by(director) %&gt;%
+  summarise(avg = mean(rating), 
+            sd = sd(rating), 
+            count = n(),
+            tstat = qt(0.975, count-1),
+            se = sd/sqrt(count),
+            lower_ci = avg - tstat*se, 
+            upper_ci = avg + tstat*se) 
+S_directors</code></pre>
+<pre><code>## # A tibble: 2 × 8
+##   director           avg    sd count tstat    se lower_ci upper_ci
+##   &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1 Steven Spielberg  7.57 0.695    23  2.07 0.145     7.27     7.87
+## 2 Tim Burton        6.93 0.749    16  2.13 0.187     6.53     7.33</code></pre>
+<pre class="r"><code>ggplot(S_directors, aes(x = avg,
+                        y = reorder(director, avg), 
+                        color = director)) +
+   annotate(&quot;rect&quot;, 
+           fill = &quot;grey&quot;, 
+           alpha = 0.5, 
+           xmin=7.27, 
+           xmax= 7.33, 
+           ymin=-Inf, 
+           ymax = Inf)+
+  geom_errorbar(aes(xmin = lower_ci, 
+                    xmax = upper_ci), 
+                width = 0.1) +
+  
+  labs(title = &quot;Do Spielberg and Burton have the same IMDB Ratings&quot;,
+       subtitle = &quot;95% confidence intervals overlap&quot;,
+       x = &quot;Mean IMDB Rating&quot;,
+       y = &quot;&quot;) +
+  
+  geom_text(aes(label=round(lower_ci,2)), 
+            vjust=-1.5,
+            hjust=3,
+            angle=0, 
+            color=&quot;black&quot;, 
+            size=7) +
+  
+  geom_text(aes(label=round(upper_ci,2)), 
+            vjust=-1.5,
+            hjust=-2,
+            angle=0, 
+            color=&quot;black&quot;, 
+            size=7) +
+  
+  geom_text(aes(label=round(avg,2)), 
+            vjust=-1, 
+            colour= &quot;black&quot;, 
+            size= 11)+
+  
+  geom_point() +
+  theme_classic()+
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/blogs/directors_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>In addition, you will run a hpothesis test. You should use both the <code>t.test</code> command and the <code>infer</code> package to simulate from a null distribution, where you assume zero difference between the two:</p>
+<pre class="r"><code>#The null hypothesis: both directors have the same budget for their films
+#The alternative hypothesis: both directors don&#39;t have the same budget for their films
+
+Null_testing &lt;- movies %&gt;%
+  select(director, budget) %&gt;%
+  filter(director == &quot;Tim Burton&quot; | director == &quot;Steven Spielberg&quot;)
+
+t.test(budget ~ director, data =Null_testing)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  budget by director
+## t = -0.90373, df = 25.756, p-value = 0.3745
+## alternative hypothesis: true difference in means between group Steven Spielberg and group Tim Burton is not equal to 0
+## 95 percent confidence interval:
+##  -53357358  20778086
+## sample estimates:
+## mean in group Steven Spielberg       mean in group Tim Burton 
+##                       61647864                       77937500</code></pre>
+<pre class="r"><code>budget_null_init&lt;- Null_testing%&gt;%
+specify(budget ~ director)%&gt;%
+calculate(stat=&quot;diff in means&quot;,order=c(&quot;Steven Spielberg&quot;,&quot;Tim Burton&quot;)) 
+
+#Test Simulation on the null distribution
+budget_null&lt;-Null_testing%&gt;%
+specify(budget ~ director)%&gt;%
+hypothesize(null=&quot;independence&quot;)%&gt;%
+generate(reps=1000,type=&quot;permute&quot;)%&gt;%
+  
+calculate(stat=&quot;diff in means&quot;,order=c(&quot;Steven Spielberg&quot;,&quot;Tim Burton&quot;))
+
+#Null distribution Visualization and get the p value
+budget_null %&gt;% 
+visualize() +
+  theme_classic()+
+  shade_p_value(obs_stat = budget_null_init,
+                direction = &quot;two-sided&quot;) </code></pre>
+<p><img src="/blogs/directors_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>budget_null %&gt;% get_p_value(obs_stat = budget_null_init, direction = &quot;two_sided&quot;)</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   p_value
+##     &lt;dbl&gt;
+## 1    0.27</code></pre>
