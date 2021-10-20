@@ -1,0 +1,151 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: How has the CPI and its components changed over the last few years? # the title that will show up once someone gets to this page
+draft: false
+image: inflation.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: cpi_change # slug is the shorthand URL address... no spaces plz
+title: Change in CPI and Its Components
+---
+
+```{r load-libraries, include=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(lubridate)
+library(here)
+library(skimr)
+library(janitor)
+library(httr)
+library(readxl)
+library(vroom)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Remember how we used the tidyqant package to download CPI data. In this exercise, I would like you to do the following:
+
+1. You can find [CPI components at  FRED](https://fredaccount.stlouisfed.org/public/datalist/843). You should adapt the code from German polls to scrape the FRED website and pull all of the CPI components into a vector. FIY, the list of components is the second table in that webpage.
+1. Once you have a vector of components, you can then pass it to `tidyquant::tq_get(get = "economic.data", from =  "2000-01-01")` to get all data since January 1, 2000
+1. Since the data you download is an index with various starting dates, you need to calculate the yearly, or 12-month change. To do this you need to use the `lag` function, and specifically, `year_change = value/lag(value, 12) - 1`; this means you are comparing the current month's value with that 12 months ago lag(value, 12).
+1. I want you to order components so the higher the yearly change, the earlier does that component appear.
+1. You should also make sure that the **All Items** CPI (CPIAUCSL) appears first.
+1. Add a `geom_smooth()` for each component to get a sense of the overall trend.
+1 You may want to colour the points according to whether yearly change was positive or negative. 
+
+Having done this, you should get this graph.
+
+```{r}
+
+
+library(selectr)
+library(vroom)
+library(tidyquant)
+library(rvest)
+
+# get tables that exist on the page
+url <- "https://fredaccount.stlouisfed.org/public/datalist/843"
+table_1 <- url %>% 
+  read_html() %>% 
+  html_nodes(css="table")
+
+
+
+# Use purr::map() to create a list of all tables in URL
+CPI_raw <- map(table_1,. %>% html_table(fill=TRUE)%>% 
+             janitor::clean_names())
+
+# Select 2nd table on the page
+CPI<- CPI_raw[[2]] 
+CPI2 <- CPI %>% select(series_id) %>% pull()
+
+#Download desired data
+CPI_data <- tidyquant::tq_get(CPI2,get = "economic.data", from =  "2000-01-01")
+```
+
+```{r}
+#Recover info from the second table of CPI_raw and merge it to CPI_data
+CPI_raw[[2]]
+CPI_data <- merge(x = CPI_data, y = CPI_raw[[2]], by.x = "symbol",by.y = "series_id", all.x = TRUE)
+
+```
+
+```{r}
+
+#Manipulate DB as required to be able to plot the graph
+CPI_data2 <- CPI_data %>% 
+  subset(date>= "2015-01-01" & date <= "2021-08-01") %>% 
+  mutate(yr=year(date),mt=month(date)) %>% 
+  arrange(date)
+
+CPI_data3 <- CPI_data2 %>% 
+  arrange(date,title)%>% 
+  mutate(yearly_change=price/lag(price,n=588)-1, short_title = (title %>%
+             str_sub(47) %>%
+               str_sub(end = -22)),
+         title_2=ifelse(title=="Consumer Price Index for All Urban Consumers: All Items in U.S. City Average",title,NA)) 
+
+CPI_data3 <- CPI_data3 %>% filter(yr>=2016) %>% mutate(short_title = fct_reorder(short_title, yearly_change, min)) 
+
+```
+
+```{r, out.width="100%"}
+
+#Load package to be able to modify titles as required
+library(ggtext)
+
+
+#Plot the graph
+CPI_data3%>% 
+  ggplot(aes(x=date,y=yearly_change))+
+  geom_point(aes(color=ifelse(yearly_change>0,"brown3","skyblue4")),size=0.1)+
+  facet_wrap(vars(short_title),scales="free")+
+  theme_bw(base_size = 5)+
+  geom_smooth(size=0.4,color="grey60",se=FALSE)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1))+
+  theme(legend.position = "none",plot.title = element_markdown())+
+  scale_x_date(limits=as.Date(c('2016-01-01','2021-08-01')))+
+  labs(x = "",y = "YoY % Change",title = "<span style = 'font-size:12pt;'>**Yearly change of US CPI (All Items) and its components**</span><br>YoY change being <span style = 'color:brown3;'>positive</span> or
+<span style = 'color:skyblue4;'> negative</span> <br>Jan 2016 to Aug 2021.</span>",
+caption = "Data from  St. louis Fed FRED")
+```
+
+This graphs is fine, but perhaps has too many sub-categories. You can find the [relative importance of components in the Consumer Price Indexes: U.S. city average, December 2020](https://www.bls.gov/cpi/tables/relative-importance/2020.htm) here. Can you choose a smaller subset of the components you have and only list the major categories (Housing, Transportation, Food and beverages, Medical care, Education and communication, Recreation, and Apparel), sorted according to their relative importance?
+
+```{r}
+#Create new DB with only the desired categories
+CPI_data4 <- CPI_data3 %>%
+  filter(short_title == "Housing"|short_title =="Transportation"|short_title =="Food and Beverages"
+         |short_title=="Medical Care"|short_title=="Education and Communication"|
+           short_title=="Recreation"|short_title=="Apparel") 
+
+#Sort the facet order as desired
+CPI_data4$facet = factor(CPI_data4$short_title, levels = c("Housing", "Food and Beverages", "Transportation", "Apparel"))
+
+#Plot the graph
+CPI_data4%>% 
+  ggplot(aes(x=date,y=yearly_change))+
+  geom_point(aes(color=ifelse(yearly_change>0,"brown3","skyblue4")),size=1)+
+  facet_wrap(~facet,scales="free")+
+  theme_bw(base_size = 10)+
+  geom_smooth(size=1,color="grey60",se=FALSE)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1))+
+  theme(legend.position = "none",plot.title = element_markdown())+
+  scale_x_date(limits=as.Date(c('2016-01-01','2021-08-01')))+
+  labs(
+    x = "",
+    y = "YoY % Change",
+    title = "<span style = 'font-size:14pt;'>**Yearly change of selected US CPI components**</span><br>
+YoY change being <span style = 'color:brown3;'>positive</span> or
+<span style = 'color:skyblue4;'> negative</span> <br>Jan 2016 to Aug 2021.</span>",caption = "Data from  St. louis Fed FRED
+https://fredaccount.stlouisfed.org/public/datalist/843") 
+
+
+#It was possible to carry out the task only for the categories that are present in the original DB: Medical Care, Recreation and Education are not there. Even in the graph given we could not find them
+```

@@ -90,12 +90,12 @@ params:
         url: blogs/global_warming
       - image: chair.jpeg
         subtitle: Do the ratings for different directos have statistically significant differences in their averages?
-        title: The Effect of Different Directors on Movie Ratings
+        title: The Effect of Directors on Movie Ratings
         url: blogs/movies_imdb
-      - image: pic04.jpg
-        subtitle: Nisl Sed Aliquam
-        title: Ipsum
-        url: blogs/ipsum
+      - image: inflation.jpg
+        subtitle: How did CPI and its components change in the last few years?
+        title: Change in CPI and Its Components
+        url: blogs/cpi_change
       - image: pic05.jpg
         subtitle: Ipsum Dolor Sit Amet
         title: Consequat
