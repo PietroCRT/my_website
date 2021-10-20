@@ -92,7 +92,7 @@ params:
         subtitle: Do the ratings for different directos have statistically significant differences in their averages?
         title: The Effect of Directors on Movie Ratings
         url: blogs/movies_imdb
-      - image: inflation.jpg
+      - image: infl.png
         subtitle: How did CPI and its components change in the last few years?
         title: Change in CPI and Its Components
         url: blogs/cpi_change
