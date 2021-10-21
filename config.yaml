@@ -71,7 +71,7 @@ params:
       - name: My Articles
         url: blogs
       - name: My CV
-        url: blogs/my_cv
+        url: cv/my_cv
       - name: Elements
         url: elements.html
     menu: Menu

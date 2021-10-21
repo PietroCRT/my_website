@@ -8,7 +8,7 @@ draft: false
 image: gdp_1.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
 
 keywords: ""
-slug: gdp_components # slug is the shorthand URL address... no spaces plz
+slug: gdp_components/ # slug is the shorthand URL address... no spaces plz
 title: Evolution of GDP Components Across Countries
 ---
 
@@ -42,10 +42,7 @@ The GDP data we will look at is from the [United Nations' National Accounts Main
 
 ```{r read_GDP_data}
 
-UN_GDP_data  <-  read_excel(here::here("data", "Download-GDPconstant-USD-countries.xls"), # Excel filename
-                sheet="Download-GDPconstant-USD-countr", # Sheet name
-                skip=2) # Number of rows to skip
-
+UN_GDP_data  <-  read_excel(path="//Users/pietro_crt/Desktop/LBS/Courses/Data Analytics/ca09.mfa2022/data/Download-GDPconstant-USD-countries.xlsx",sheet="Download-GDPconstant-USD-countr",skip=2) 
 ```
 
  The first thing you need to do is to tidy the data, as it is in wide format and you must make it into long, tidy format. Please express all figures in billions (divide values by `1e9`, or $10^9$), and you want to rename the indicators into something shorter.
