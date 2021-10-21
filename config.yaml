@@ -105,15 +105,10 @@ params:
         title: Evolution of GDP Components Across Countries
         url: blogs/gdp_components
   two:
-    buttonText: Get Started
+    buttonText: Check out my work
     enable: yes
-    subtitle: "Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero.
-      \n    Mauris aliquet magna magna sed nunc rhoncus pharetra. \n    Pellentesque
-      condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia
-      pellentesque lorem ipsum dolor. \n    Nullam et orci eu lorem consequat tincidunt.
-      Vivamus et sagittis libero.\n    Mauris aliquet magna magna sed nunc rhoncus
-      amet pharetra et feugiat tempus."
-    title: Massa libero
+    subtitle: "Consider following me on social media platforms to keep uoptaded on my work and don't hesitate to contact me by e-mail. \n Pietro"
+    title: Thanks for checking out my website!
     url: blogs
     
     
