@@ -1,0 +1,138 @@
+---
+categories:  
+- ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
+- ""
+date: "2021-09-30"
+description: A glimpse of who I am and of my experiences # the title that will show up once someone gets to this page
+draft: false
+image: pietro.jpeg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+
+keywords: ""
+slug: my_cv # slug is the shorthand URL address... no spaces plz
+title: My Curriculum Vitae
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+**Pietro Rocco di Torrepadula**
+
+**<Pietror.mfa2022@london.edu> +39 340 162 37 23 +44 (0) 788 811 69 04
+[LinkedIn](https://www.linkedin.com/in/pietro-rocco-di-torrepadula-397b51187/)**
+
+**EDUCATION**
+
+**2021 - 2022 London Business School**
+
+> Reading for Masters in Financial Analysis (MFA) degree
+>
+> GMAT: 740
+>
+> Modules include Asset Management, Corporate Finance, Accounting, and
+> Financial Markets
+
+**2016 - 2020 Bocconi University, Milan, Italy**
+
+> BSc International Economics and Finance (BIEF), Final Grade: 108/110
+
+**BUSINESS EXPERIENCE**
+
+**2021 CREDIMI, Milan, Italy**
+
+> **European leader in digital business lending (>€1.7B financed)\
+> Marketing Intern (3 months)**
+
+-   Extracted periodically from large databases, analysed with Excel and
+    HubSpot, and presented to senior management data on Italian lending
+    market trends and relative company performance
+
+-   Managed customer relationship in main social media platforms and
+    guided relative content creation with data driven approach based on
+    both lead conversion figures and qualitative response of potential
+    and existing customers on company's social networks
+
+-   Developed new lending product for the digitalisation of SMEs
+    together with marketing and lending teams, presented the product to
+    potential partners and led negotiations of terms
+
+**2020 - 2021 BAIN & COMPANY, Milan, Italy\
+Associate Consultant Intern (3 months)**
+
+-   Reconstructed and consolidated with Excel a group-wide personnel
+    database from fragmented subsidiary data for Italian largest
+    motorway concession holder (>7k employees, \~4m revenues)
+
+-   Researched optimal industry HR ratios in both Bain proprietary and
+    external databases, computed current client's HR ratios and
+    individuated changes to be implemented for radical HR restructuring
+
+-   Researched and evaluated for possible implementation industry best
+    practices in terms of corporate social responsibility for main
+    Italian utility company (\~44B revenues)
+
+-   Prepared slide decks to present research and analysis to existing
+    and potential clients
+
+**2019 ARISTON THERMO, Milan, Italy**
+
+> **Industrial leader in the global thermic comfort market**
+>
+> **Summer Intern (2 months) -- Investment branch**
+
+-   Reorganised multiple financial statements with Excel to evaluate
+    potential investment targets
+
+-   Researched and contacted key people in different industries
+    world-wide to conduct preliminary market research to individuate
+    most promising sectors in which to initiate search of targets
+
+-   Developed a new Excel dashboard to better understand the financial
+    evolution of investments than differ in both sector, financial form,
+    and level of control
+
+**2018 UNICREDIT, Milan, Italy**
+
+> **Largest Italian bank**
+>
+> **Summer Intern (2 months)**
+
+-   Discovered the processes behind LBO operations by supporting
+    Financial Sponsors Solutions team
+
+-   Examined financial statements and investors presentations of major
+    Italian gambling company (>600m revenues) to select potential target
+    to be proposed to PE clients
+
+**2016 BANCA DEL PIEMONTE, Milan, Italy**
+
+> **Regional bank and private banking boutique**
+>
+> **Summer Intern (2 weeks)**
+
+-   Developed personalised commercial proposals based on market trends
+    and individual customer needs together with private bankers
+
+-   Visited and familiarised with various bank's organs: from the CEO
+    office to the trading floor
+
+**ADDITIONAL INFORMATION**
+
+-   **Languages**: Italian (native), English (fluent), Spanish
+    > (intermediate -- B2)
+
+-   **Computing**: Microsoft Office (proficient -- ECDL diploma), Python
+    > (basic), R/R Studio (basic)
+
+-   **Certificates**: Bloomberg Market Concepts (BMC)
+
+-   **Student clubs**: member of Bocconi Milton Friedman Society --
+    > organized and promoted events with 200+ attendees and renowned
+    > speakers, member of LBS Italian club, PE and VC club, Investment
+    > Management club
+
+-   **Personal interests**: Classic cars -- research on history,
+    > technical aspects, and market trends; History and Geopolitics

@@ -8,7 +8,7 @@ params:
   banner:
     buttonText: Get Started
     subtitle: |-
-      Data Analytics - individual project.
+      Data Analytics - individual project
     title: Hi, my name is Pietro, I'm a student at LBS and this is my portfolio website
   blog: {}
   contact:
