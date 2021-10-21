@@ -72,8 +72,8 @@ params:
         url: blogs
       - name: My CV
         url: cv/my_cv
-      - name: Elements
-        url: elements.html
+#      - name: Elements
+#        url: elements.html
     menu: Menu
     subtitle: By HTML5 Up
     title: Forty
