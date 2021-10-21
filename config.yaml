@@ -68,10 +68,10 @@ params:
     links:
       - name: Home
         url: '#'
-      - name: Blogs
+      - name: My Articles
         url: blogs
-      - name: Generic Blog
-        url: blogs/ipsum
+      - name: My CV
+        url: blogs/my_cv
       - name: Elements
         url: elements.html
     menu: Menu
@@ -105,14 +105,9 @@ params:
         title: Evolution of GDP Components Across Countries
         url: blogs/gdp_components
   two:
-    buttonText: Get Started
+    buttonText: Back to My work
     enable: yes
-    subtitle: "Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero.
-      \n    Mauris aliquet magna magna sed nunc rhoncus pharetra. \n    Pellentesque
-      condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia
-      pellentesque lorem ipsum dolor. \n    Nullam et orci eu lorem consequat tincidunt.
-      Vivamus et sagittis libero.\n    Mauris aliquet magna magna sed nunc rhoncus
-      amet pharetra et feugiat tempus."
+    subtitle: "Plese consider following me on social media and don't hesitate to contact me by e-mail."
     title: Thanks for checking out work!
     url: blogs
     
