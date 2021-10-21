@@ -80,7 +80,7 @@ params:
   tiles:
     enable: yes
     showcase:
-      - image: pietro
+      - image: pietro.jpeg
         subtitle: A glimpse of who I am and of my experiences
         title: My Curriculum Vitae
         url: blogs/my_cv
